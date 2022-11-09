@@ -22,7 +22,14 @@ class TicTacToeGame:
 
         self.round: int = 1
 
-
+    def print_game_field(self):
+        print(f"""
+        {self.game_field[0].value} | {self.game_field[1].value} | {self.game_field[2].value}
+        ---------
+        {self.game_field[3].value} | {self.game_field[4].value} | {self.game_field[5].value}
+        --------- 
+        {self.game_field[6].value} | {self.game_field[7].value} | {self.game_field[8].value}
+        """)
 
     def next_move(self, index: int) -> None:
         next_player = Player.X if self.round % 2 == 0 else Player.O
