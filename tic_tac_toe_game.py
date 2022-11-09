@@ -4,7 +4,7 @@ from enum import Enum
 class Player(Enum):
     X = "X"
     O = "O"
-    N = "#"  # nothing
+    N = "#"  # nothing --> empty field
 
 
 class TicTacToeGame:
@@ -32,4 +32,13 @@ class TicTacToeGame:
             raise Exception("There is already a player on that field")
 
     def check_for_win(self) -> bool:
-        pass
+        win_possibilities: list[list[int]] = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ]
