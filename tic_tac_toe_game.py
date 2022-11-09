@@ -22,6 +22,8 @@ class TicTacToeGame:
 
         self.round: int = 1
 
+
+
     def next_move(self, index: int) -> None:
         next_player = Player.X if self.round % 2 == 0 else Player.O
 
@@ -42,3 +44,8 @@ class TicTacToeGame:
             [0, 4, 8],
             [2, 4, 6],
         ]
+        for pos in win_possibilities:
+            is_win = len({self.game_field[pos[0]], self.game_field[pos[1]], self.game_field[pos[2]]}) == 1
+            if is_win:
+                return True
+        return False
