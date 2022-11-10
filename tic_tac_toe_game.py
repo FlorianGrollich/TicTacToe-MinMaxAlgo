@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Player(Enum):
+class FieldState(Enum):
     X = "X"
     O = "O"
     N = "#"  # nothing --> empty field
@@ -15,10 +15,10 @@ class TicTacToeGame:
         #   3 | 4 | 5
         #   ---------
         #   6 | 7 | 8
-        self.game_field: list[Player] = [
-            Player.N, Player.N, Player.N,
-            Player.N, Player.N, Player.N,
-            Player.N, Player.N, Player.N]
+        self.game_field: list[FieldState] = [
+            FieldState.N, FieldState.N, FieldState.N,
+            FieldState.N, FieldState.N, FieldState.N,
+            FieldState.N, FieldState.N, FieldState.N]
 
         self.round: int = 1
 
@@ -32,13 +32,20 @@ class TicTacToeGame:
         """)
 
     def next_move(self, index: int) -> None:
-        next_player = Player.X if self.round % 2 == 0 else Player.O
+        next_player = FieldState.X if self.round % 2 == 0 else FieldState.O
 
-        if self.game_field[index] == Player.N:
+        if self.game_field[index] == FieldState.N:
             self.game_field[index] = next_player
             self.round += 1
         else:
             raise Exception("There is already a player on that field")
+
+    def get_possible_moves(self) -> list[int]:
+        result = []
+        for i, field in enumerate(self.game_field):
+            if field == FieldState.N:
+                result.append(i)
+        return result
 
     def check_for_win(self) -> int:
         win_possibilities: list[list[int]] = [
@@ -54,9 +61,9 @@ class TicTacToeGame:
         for pos in win_possibilities:
             is_win = len({self.game_field[pos[0]], self.game_field[pos[1]], self.game_field[pos[2]]}) == 1
             if is_win:
-                if self.game_field[pos[0]] == Player.X:
+                if self.game_field[pos[0]] == FieldState.X:
                     return 1
-                elif self.game_field[pos[0]] == Player.O:
+                elif self.game_field[pos[0]] == FieldState.O:
                     return -1
         return 0
 
