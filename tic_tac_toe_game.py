@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 
 class Player(Enum):
@@ -41,7 +40,7 @@ class TicTacToeGame:
         else:
             raise Exception("There is already a player on that field")
 
-    def check_for_win(self) -> Optional[Player]:
+    def check_for_win(self) -> int:
         win_possibilities: list[list[int]] = [
             [0, 1, 2],
             [3, 4, 5],
@@ -55,5 +54,10 @@ class TicTacToeGame:
         for pos in win_possibilities:
             is_win = len({self.game_field[pos[0]], self.game_field[pos[1]], self.game_field[pos[2]]}) == 1
             if is_win:
-                return
-        return None
+                if self.game_field[pos[0]] == Player.X:
+                    return 1
+                elif self.game_field[pos[0]] == Player.O:
+                    return -1
+        return 0
+
+
