@@ -7,6 +7,12 @@ class Player(Enum):
     N = "#"  # nothing --> empty field
 
 
+class GameResult(Enum):
+    PlayerX = "X"
+    PlayerO = "O"
+    Draw = "D"
+
+
 class TicTacToeGame:
     def __init__(self):
         #   INDEX for playing field
