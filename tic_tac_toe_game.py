@@ -1,80 +1,141 @@
+import copy
 from enum import Enum
+from typing import Optional
 
 
 class FieldState(Enum):
     X = "X"
     O = "O"
-    N = "#"  # nothing --> empty field
-
-    #   INDEX for playing field
-    #   0 | 1 | 2
-    #   ---------
-    #   3 | 4 | 5
-    #   ---------
-    #   6 | 7 | 8
 
 
-game_field: list[FieldState] = [
-
-    FieldState.N, FieldState.N, FieldState.N,
-    FieldState.N, FieldState.N, FieldState.N,
-    FieldState.N, FieldState.N, FieldState.N]
-
-round: int = 1
+EMPTY = None
+boardType = list[list[Optional[FieldState]]]
 
 
-def print_game_field():
+def print_board(board: boardType):
     print(f"""
-    {game_field[0].value} | {game_field[1].value} | {game_field[2].value}
-    ---------
-    {game_field[3].value} | {game_field[4].value} | {game_field[5].value}
+    {'#' if board[0][0] is None else board[0][0].value} | {'#' if board[0][1] is None else board[0][1].value} | {'#' if board[0][2] is None else board[0][2].value}
     --------- 
-    {game_field[6].value} | {game_field[7].value} | {game_field[8].value}
+    {'#' if board[1][0] is None else board[1][0].value} | {'#' if board[1][1] is None else board[1][1].value} | {'#' if board[1][2] is None else board[1][2].value}
+    ---------
+    {'#' if board[2][0] is None else board[2][0].value} | {'#' if board[2][1] is None else board[2][1].value} | {'#' if board[2][2] is None else board[2][2].value}
+    
     """)
 
 
-def next_move(index: int) -> list[FieldState]:
-    next_player = FieldState.X if round % 2 == 0 else FieldState.O
+def get_init_board():
+    return [[FieldState.X, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY]]
 
-    if game_field[index] == FieldState.N:
-        field = game_field.copy()
-        field[index] = next_player
-        return field
+
+def next_player(board):
+    x = 0
+    o = 0
+    for row in board:
+        x += row.count(FieldState.X)
+        o += row.count(FieldState.O)
+    return FieldState.X if x == o else FieldState.O
+
+
+def possible_moves(board):
+    moves = set()
+
+    for i_row, row in enumerate(board):
+        for i_col, col in enumerate(row):
+            if col == EMPTY:
+                moves.add((i_row, i_col))
+    return moves
+
+
+def do_move(board, move):
+    r = copy.deepcopy(board)
+    r[move[0]][move[1]] = next_player(board)
+    return r
+
+
+def check_for_winner(board):
+    posibilities = [
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[2, 0], [1, 1], [0, 2]]]
+
+    for pos in posibilities:
+        r = []
+        for cord in pos:
+            field = board[cord[1]][cord[0]]
+            if field == EMPTY:
+                break
+            else:
+                r.append(field)
+        if r.count(FieldState.X) == 3 or r.count(FieldState.O) == 3:
+            return r[0]
+    return None
+
+
+def check_game_over(board):
+    if check_for_winner(board) is not None or (
+            not any(EMPTY in sublist for sublist in board) and check_for_winner(board) is None):
+        return True
     else:
-        raise Exception("There is already a player on that field")
+        return False
 
 
-def get_possible_moves() -> list[int]:
-    result = []
-    for i, field in enumerate(game_field):
-        if field == FieldState.N:
-            result.append(i)
-    return result
+def get_finished_game_value(board):
+    if check_for_winner(board) == FieldState.X:
+        return 1
+    elif check_for_winner(board) == FieldState.O:
+        return -1
+    else:
+        return 0
 
 
-def check_for_win(board) -> int:
-    win_possibilities: list[list[int]] = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-    ]
-    for pos in win_possibilities:
-        is_win = len({board[pos[0]], board[pos[1]], board[pos[2]]}) == 1
-        if is_win:
-            if board[pos[0]] == FieldState.X:
-                return 1
-            elif board[pos[0]] == FieldState.O:
-                return -1
-    return 0
+def minimax(board):
+    if check_game_over(board):
+        return None
+    else:
+        if next_player(board) == FieldState.X:
+            value, move = max_value(board)
+            return move
+        else:
+            value, move = min_value(board)
+            return move
 
 
-def calculate_score(move: int):
-    new_board = next_move(move)
-    is_win = check_for_win(new_board)
-    if is_win != 0:
-        return is_win
+def max_value(board):
+    if check_game_over(board):
+        return get_finished_game_value(board), None
+
+    v = float('-inf')
+    move = None
+    for pos_move in possible_moves(board):
+        value, m = min_value(do_move(board, pos_move))
+        if value < v:
+            v = value
+            move = pos_move
+            if v == -1:
+                return v, move
+
+    return v, move
+
+
+def min_value(board):
+    if check_game_over(board):
+        return get_finished_game_value(board), None
+
+    v = float('inf')
+    move = None
+    for pos_move in possible_moves(board):
+        value, m = max_value(do_move(board, pos_move))
+        if value < v:
+            v = value
+            move = pos_move
+            if v == -1:
+                return v, move
+
+    return v, move
