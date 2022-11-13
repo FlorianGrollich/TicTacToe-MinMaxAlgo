@@ -32,6 +32,7 @@ for i in range(9):
     move = minimax(board)
     board = do_move(board, move)
     print_board(board)
-
+    if check_game_over(board):
+        break
 
 print_board(board)
