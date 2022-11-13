@@ -24,7 +24,7 @@ def print_board(board: boardType):
 
 
 def get_init_board():
-    return [[FieldState.X, EMPTY, EMPTY],
+    return [[EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY]]
 
@@ -115,10 +115,10 @@ def max_value(board):
     move = None
     for pos_move in possible_moves(board):
         value, m = min_value(do_move(board, pos_move))
-        if value < v:
+        if value > v:
             v = value
             move = pos_move
-            if v == -1:
+            if v == 1:
                 return v, move
 
     return v, move
