@@ -23,13 +23,13 @@ def print_board(board: boardType):
     """)
 
 
-def get_init_board():
+def get_init_board() -> boardType:
     return [[EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY]]
 
 
-def next_player(board):
+def next_player(board: boardType) -> FieldState:
     x = 0
     o = 0
     for row in board:
@@ -38,7 +38,7 @@ def next_player(board):
     return FieldState.X if x == o else FieldState.O
 
 
-def possible_moves(board):
+def possible_moves(board: boardType) -> set[tuple[int, int]]:
     moves = set()
 
     for i_row, row in enumerate(board):
@@ -48,13 +48,13 @@ def possible_moves(board):
     return moves
 
 
-def do_move(board, move):
+def do_move(board: boardType, move: tuple[int, int]) -> boardType:
     r = copy.deepcopy(board)
     r[move[0]][move[1]] = next_player(board)
     return r
 
 
-def check_for_winner(board):
+def check_for_winner(board: boardType) -> Optional[FieldState]:
     posibilities = [
         [[0, 0], [1, 0], [2, 0]],
         [[0, 1], [1, 1], [2, 1]],
@@ -78,7 +78,7 @@ def check_for_winner(board):
     return None
 
 
-def check_game_over(board):
+def check_game_over(board: boardType) -> bool:
     if check_for_winner(board) is not None or (
             not any(EMPTY in sublist for sublist in board) and check_for_winner(board) is None):
         return True
@@ -86,7 +86,7 @@ def check_game_over(board):
         return False
 
 
-def get_finished_game_value(board):
+def get_finished_game_value(board: boardType) -> int:
     if check_for_winner(board) == FieldState.X:
         return 1
     elif check_for_winner(board) == FieldState.O:
@@ -95,7 +95,7 @@ def get_finished_game_value(board):
         return 0
 
 
-def minimax(board):
+def minimax(board: boardType) -> Optional[tuple[int, int]]:
     if check_game_over(board):
         return None
     else:
@@ -107,7 +107,7 @@ def minimax(board):
             return move
 
 
-def max_value(board):
+def max_value(board: boardType) -> tuple[int, Optional[tuple[int, int]]]:
     if check_game_over(board):
         return get_finished_game_value(board), None
 
@@ -124,7 +124,7 @@ def max_value(board):
     return v, move
 
 
-def min_value(board):
+def min_value(board: boardType) -> tuple[int, Optional[tuple[int, int]]]:
     if check_game_over(board):
         return get_finished_game_value(board), None
 
