@@ -24,7 +24,7 @@ index_to_move = {
 }
 
 for i in range(9):
-    index = int(input("Where do you wanna place your X?(0-9)"))
+    index = int(input("Where do you wanna place your X?(0-9)\n"))
     board = do_move(board, index_to_move[index])
     if check_game_over(board):
         break
